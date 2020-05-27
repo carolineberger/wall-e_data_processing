@@ -1,12 +1,9 @@
 import csv
 import pathlib
 import pandas
+import global_constants as gc
 
-
-RAW_DATA_FOLDER_NAME = 'raw_data'
-
-
-projectPath = pathlib.Path().absolute() / RAW_DATA_FOLDER_NAME
+projectPath = pathlib.Path().absolute() / gc.RAW_DATA_FOLDER_NAME
 rawData = []
 
 for f in projectPath.rglob("*.csv"):
@@ -44,6 +41,7 @@ def read_csv(rawData):
         new_df.reset_index()
 
         print(df)
+
         print(new_df)
 
 read_csv(rawData)
