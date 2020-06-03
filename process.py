@@ -1,4 +1,3 @@
-import csv
 import pathlib
 import pandas
 import global_constants as gc
@@ -53,7 +52,8 @@ class LikertResponse(object):
     def __str__(self):
         return str(self.likert_code) + "_" + str(self.trial_id) + "_" + str(self.subject_id)
 
-
+# TODO: check code coverage
+# TODO: document file
 def clean_columns(raw_data, to_drop):
     # list of all the clean data data frames
     clean_data = []
@@ -82,6 +82,7 @@ def clean_columns(raw_data, to_drop):
         # subject id should not be hard coded
         dict = {'SubjectID': ['045d6e36']}
         new_columns = []
+        #TODO: make subject_id not hard coded
         new_columns.append('SubjectID')
         for i in range(len(msg_responses)):
             if msg_responses[i].subject_id == '045d6e36':
@@ -89,6 +90,7 @@ def clean_columns(raw_data, to_drop):
                 dict[(msg_responses[i].msg_id+ "_Response_Time")] = msg_responses[i].resp_time
                 new_columns.append(msg_responses[i].msg_id + "_Response")
                 new_columns.append(msg_responses[i].msg_id + "_Response_Time")
+                #TODO: make columns not hard coded probably use % to decide if message is of type likert question 1, 2 or 3
                 new_columns.append(msg_responses[i].msg_id + "_LM1_Response")
                 new_columns.append(msg_responses[i].msg_id + "_LM1_Response_Time")
                 new_columns.append(msg_responses[i].msg_id + "_LM2_Response")
@@ -97,6 +99,7 @@ def clean_columns(raw_data, to_drop):
                 new_columns.append(msg_responses[i].msg_id + "_LM3_Response_Time")
 
                 if i != 0 and (i - 2) % 3 == 0:
+                    # TODO: make columns not hard coded
                     new_columns.append(msg_responses[i].trial_id + "_LB1_Response")
                     new_columns.append(msg_responses[i].trial_id + "_LB1_Response_Time")
                     new_columns.append(msg_responses[i].trial_id + "_LB2_Response")
@@ -119,7 +122,7 @@ def clean_columns(raw_data, to_drop):
             elif l_response.subject_id == '045d6e36' and l_response.associated_msg == "System":
                 dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response")] = l_response.answer
                 dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response_Time")] = l_response.resp_time
-
+        #TODO: check ordering of exported file Likert Block Questions and Responses
         new_df = pandas.DataFrame(data= dict, columns=new_columns)
         clean_data.append(NamedDataFrame(f.name, new_df))
 
