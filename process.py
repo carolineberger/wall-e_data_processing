@@ -79,9 +79,6 @@ def clean_columns(raw_data, to_drop):
 
 
         likert_responses.sort(key=lambda x: x.trial_id)
-        block_likerts_filtered = filter(lambda x: x.associated_msg == "System", likert_responses)
-        block_likert = zip(*(iter(block_likerts_filtered),) * 7)        ## 2D array
-
         # subject id should not be hard coded
         dict = {'SubjectID': ['045d6e36']}
         new_columns = []
