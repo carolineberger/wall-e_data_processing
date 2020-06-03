@@ -82,26 +82,48 @@ def clean_columns(raw_data, to_drop):
         block_likerts_filtered = filter(lambda x: x.associated_msg == "System", likert_responses)
         block_likert = zip(*(iter(block_likerts_filtered),) * 7)        ## 2D array
 
-
+        # subject id should not be hard coded
+        dict = {'SubjectID': ['045d6e36']}
         new_columns = []
         new_columns.append('SubjectID')
         for i in range(len(msg_responses)):
-            new_columns.append(msg_responses[i].msg_id + "_" + "Response")
-            new_columns.append(msg_responses[i].msg_id + "_" + "Time")
-            new_columns.append(msg_responses[i].msg_id + "_L1_Response")
-            new_columns.append(msg_responses[i].msg_id + "_L2_Response")
-            new_columns.append(msg_responses[i].msg_id + "_L3_Response")
-            if i != 0 and (i - 2) % 3 == 0:
-                new_columns.append(msg_responses[i].trial_id + "_L4_Response")
-                new_columns.append(msg_responses[i].trial_id + "_L5_Response")
-                new_columns.append(msg_responses[i].trial_id + "_L6_Response")
-                new_columns.append(msg_responses[i].trial_id + "_L7_Response")
-                new_columns.append(msg_responses[i].trial_id + "_L8_Response")
-                new_columns.append(msg_responses[i].trial_id + "_L9_Response")
+            if msg_responses[i].subject_id == '045d6e36':
+                dict[(msg_responses[i].msg_id + "_Response")] = msg_responses[i].answer
+                dict[(msg_responses[i].msg_id+ "_Response_Time")] = msg_responses[i].resp_time
+                new_columns.append(msg_responses[i].msg_id + "_Response")
+                new_columns.append(msg_responses[i].msg_id + "_Response_Time")
+                new_columns.append(msg_responses[i].msg_id + "_LM1_Response")
+                new_columns.append(msg_responses[i].msg_id + "_LM1_Response_Time")
+                new_columns.append(msg_responses[i].msg_id + "_LM2_Response")
+                new_columns.append(msg_responses[i].msg_id + "_LM2_Response_Time")
+                new_columns.append(msg_responses[i].msg_id + "_LM3_Response")
+                new_columns.append(msg_responses[i].msg_id + "_LM3_Response_Time")
 
+                if i != 0 and (i - 2) % 3 == 0:
+                    new_columns.append(msg_responses[i].trial_id + "_LB1_Response")
+                    new_columns.append(msg_responses[i].trial_id + "_LB1_Response_Time")
+                    new_columns.append(msg_responses[i].trial_id + "_LB2_Response")
+                    new_columns.append(msg_responses[i].trial_id + "_LB2_Response_Time")
+                    new_columns.append(msg_responses[i].trial_id + "_LB3_Response")
+                    new_columns.append(msg_responses[i].trial_id + "_LB3_Response_Time")
+                    new_columns.append(msg_responses[i].trial_id + "_LB4_Response")
+                    new_columns.append(msg_responses[i].trial_id + "_LB4_Response_Time")
+                    new_columns.append(msg_responses[i].trial_id + "_LB5_Response")
+                    new_columns.append(msg_responses[i].trial_id + "_LB5_Response_Time")
+                    new_columns.append(msg_responses[i].trial_id + "_LB6_Response")
+                    new_columns.append(msg_responses[i].trial_id + "_LB6_Response_Time")
+                    new_columns.append(msg_responses[i].trial_id + "_LB7_Response")
+                    new_columns.append(msg_responses[i].trial_id + "_LB7_Response_Time")
+        likert_responses.sort(key=lambda x: x.associated_msg)
+        for l_response in likert_responses:
+            if l_response.subject_id == '045d6e36' and l_response.associated_msg != "System":
+                dict[(l_response.associated_msg + "_"+l_response.likert_code +"_Response")] = l_response.answer
+                dict[(l_response.associated_msg + "_"+l_response.likert_code +"_Response_Time")] = l_response.resp_time
+            elif l_response.subject_id == '045d6e36' and l_response.associated_msg == "System":
+                dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response")] = l_response.answer
+                dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response_Time")] = l_response.resp_time
 
-        new_df = pandas.DataFrame(columns=new_columns)
-
+        new_df = pandas.DataFrame(data= dict, columns=new_columns)
         clean_data.append(NamedDataFrame(f.name, new_df))
 
     return clean_data
@@ -121,52 +143,52 @@ def create_message_responses(df, ind, msg_responses):
 
 def create_likert_responses(df, ind, likert_response):
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L1', df['key2'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM1', df['key2'][ind],
                        df['rt2'][ind], df['msgblk_v3'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L2', df['key3'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM2', df['key3'][ind],
                        df['rt3'][ind], df['msgblk_v3'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L3', df['key4'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM3', df['key4'][ind],
                        df['rt4'][ind], df['msgblk_v3'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L4', df['key6'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM1', df['key6'][ind],
                        df['rt6'][ind], df['msgblk_v6'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L5', df['key7'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM2', df['key7'][ind],
                        df['rt7'][ind], df['msgblk_v6'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L6', df['key8'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM3', df['key8'][ind],
                        df['rt8'][ind], df['msgblk_v6'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L7', df['key10'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM1', df['key10'][ind],
                        df['rt10'][ind], df['msgblk_v9'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L8', df['key11'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM2', df['key11'][ind],
                        df['rt11'][ind], df['msgblk_v9'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L9', df['key12'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LM3', df['key12'][ind],
                        df['rt12'][ind], df['msgblk_v9'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L10', df['key13'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB1', df['key13'][ind],
                        df['rt13'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L11', df['key14'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB2', df['key14'][ind],
                        df['rt14'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L12', df['key15'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB3', df['key15'][ind],
                        df['rt15'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L13', df['key16'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB4', df['key16'][ind],
                        df['rt16'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L14', df['key17'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB5', df['key17'][ind],
                        df['rt17'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L15', df['key18'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB6', df['key18'][ind],
                        df['rt18'][ind]))
     likert_response.append(
-        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'L16', df['key19'][ind],
+        LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB7', df['key19'][ind],
                        df['rt19'][ind]))
 
 
