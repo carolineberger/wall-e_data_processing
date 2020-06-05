@@ -7,7 +7,7 @@ from process import clean_data_path
 
 
 def clean_columns(raw_data_file_paths, to_drop):
-
+    subject_ids = []
     clean_data = []
 
     for raw_file in raw_data_file_paths:
@@ -16,10 +16,16 @@ def clean_columns(raw_data_file_paths, to_drop):
         msg_responses = []
         likert_responses = []
         for ind in df.index:
+            if df['SubjectID'][ind] not in subject_ids:
+                subject_ids.append(df['SubjectID'][ind])
             create_message_responses(df, ind, msg_responses)
             create_likert_responses(df, ind, likert_responses)
 
-        msg_responses.sort(key=lambda x: x.msg_id)
+
+
+        #sort first by subject id, then by message id
+        msg_responses.sort(key=lambda x: (x.subject_id, x.msg_id))
+
         msg_likert = []
         for response in msg_responses:
             for l_response in likert_responses:
@@ -30,53 +36,53 @@ def clean_columns(raw_data_file_paths, to_drop):
             msg_likert.append(
                 MessageAndLikert(response.subject_id, response.trial_id, response, related_likert_messages))
 
-        likert_responses.sort(key=lambda x: x.trial_id)
+        likert_responses.sort(key=lambda x: (x.subject_id, x.trial_id))
 
-        # subject id should not be hard coded
-        dict = {'SubjectID': ['045d6e36']}
+        row_dict = {}
+        # TODO: rework dictionary so that multiple rows can be added to the csv
+        for subject_id in subject_ids:
+            row_dict['SubjectID'] = [subject_id]
+
+
         new_columns = []
-        #TODO: make subject_id not hard coded
         new_columns.append('SubjectID')
         for i in range(len(msg_responses)):
-            if msg_responses[i].subject_id == '045d6e36':
-                dict[(msg_responses[i].msg_id + "_Response")] = msg_responses[i].answer
-                dict[(msg_responses[i].msg_id+ "_Response_Time")] = msg_responses[i].resp_time
-                new_columns.append(msg_responses[i].msg_id + "_Response")
-                new_columns.append(msg_responses[i].msg_id + "_Response_Time")
-                #TODO: make columns not hard coded probably use % to decide if message is of type likert question 1, 2 or 3
-                new_columns.append(msg_responses[i].msg_id + "_LM1_Response")
-                new_columns.append(msg_responses[i].msg_id + "_LM1_Response_Time")
-                new_columns.append(msg_responses[i].msg_id + "_LM2_Response")
-                new_columns.append(msg_responses[i].msg_id + "_LM2_Response_Time")
-                new_columns.append(msg_responses[i].msg_id + "_LM3_Response")
-                new_columns.append(msg_responses[i].msg_id + "_LM3_Response_Time")
-
-                if i != 0 and (i - 2) % 3 == 0:
-                    new_columns.append(msg_responses[i].trial_id + "_LB1_Response")
-                    new_columns.append(msg_responses[i].trial_id + "_LB1_Response_Time")
-                    new_columns.append(msg_responses[i].trial_id + "_LB2_Response")
-                    new_columns.append(msg_responses[i].trial_id + "_LB2_Response_Time")
-                    new_columns.append(msg_responses[i].trial_id + "_LB3_Response")
-                    new_columns.append(msg_responses[i].trial_id + "_LB3_Response_Time")
-                    new_columns.append(msg_responses[i].trial_id + "_LB4_Response")
-                    new_columns.append(msg_responses[i].trial_id + "_LB4_Response_Time")
-                    new_columns.append(msg_responses[i].trial_id + "_LB5_Response")
-                    new_columns.append(msg_responses[i].trial_id + "_LB5_Response_Time")
-                    new_columns.append(msg_responses[i].trial_id + "_LB6_Response")
-                    new_columns.append(msg_responses[i].trial_id + "_LB6_Response_Time")
-                    new_columns.append(msg_responses[i].trial_id + "_LB7_Response")
-                    new_columns.append(msg_responses[i].trial_id + "_LB7_Response_Time")
+            row_dict[(msg_responses[i].msg_id + "_Response")] = msg_responses[i].answer
+            row_dict[(msg_responses[i].msg_id+ "_Response_Time")] = msg_responses[i].resp_time
+            new_columns.append(msg_responses[i].msg_id + "_Response")
+            new_columns.append(msg_responses[i].msg_id + "_Response_Time")
+            new_columns.append(msg_responses[i].msg_id + "_LM1_Response")
+            new_columns.append(msg_responses[i].msg_id + "_LM1_Response_Time")
+            new_columns.append(msg_responses[i].msg_id + "_LM2_Response")
+            new_columns.append(msg_responses[i].msg_id + "_LM2_Response_Time")
+            new_columns.append(msg_responses[i].msg_id + "_LM3_Response")
+            new_columns.append(msg_responses[i].msg_id + "_LM3_Response_Time")
+            if i != 0 and (i - 2) % 3 == 0:
+                new_columns.append(msg_responses[i].trial_id + "_LB1_Response")
+                new_columns.append(msg_responses[i].trial_id + "_LB1_Response_Time")
+                new_columns.append(msg_responses[i].trial_id + "_LB2_Response")
+                new_columns.append(msg_responses[i].trial_id + "_LB2_Response_Time")
+                new_columns.append(msg_responses[i].trial_id + "_LB3_Response")
+                new_columns.append(msg_responses[i].trial_id + "_LB3_Response_Time")
+                new_columns.append(msg_responses[i].trial_id + "_LB4_Response")
+                new_columns.append(msg_responses[i].trial_id + "_LB4_Response_Time")
+                new_columns.append(msg_responses[i].trial_id + "_LB5_Response")
+                new_columns.append(msg_responses[i].trial_id + "_LB5_Response_Time")
+                new_columns.append(msg_responses[i].trial_id + "_LB6_Response")
+                new_columns.append(msg_responses[i].trial_id + "_LB6_Response_Time")
+                new_columns.append(msg_responses[i].trial_id + "_LB7_Response")
+                new_columns.append(msg_responses[i].trial_id + "_LB7_Response_Time")
         likert_responses.sort(key=lambda x: x.associated_msg)
         for l_response in likert_responses:
-            if l_response.subject_id == '045d6e36' and l_response.associated_msg != "System":
-                dict[(l_response.associated_msg + "_"+l_response.likert_code +"_Response")] = l_response.answer
-                dict[(l_response.associated_msg + "_"+l_response.likert_code +"_Response_Time")] = l_response.resp_time
-            elif l_response.subject_id == '045d6e36' and l_response.associated_msg == "System":
-                dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response")] = l_response.answer
-                dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response_Time")] = l_response.resp_time
+            if l_response.associated_msg != "System":
+                row_dict[(l_response.associated_msg + "_"+l_response.likert_code +"_Response")] = l_response.answer
+                row_dict[(l_response.associated_msg + "_"+l_response.likert_code +"_Response_Time")] = l_response.resp_time
+            elif l_response.associated_msg == "System":
+                row_dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response")] = l_response.answer
+                row_dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response_Time")] = l_response.resp_time
 
         # reindex forces the correct ordering of the columns
-        new_df = pandas.DataFrame(data= dict, columns=new_columns).reindex(columns=new_columns)
+        new_df = pandas.DataFrame(data= row_dict, columns=new_columns).reindex(columns=new_columns)
         clean_data.append(NamedDataFrame(raw_file.name, new_df))
 
     return clean_data
