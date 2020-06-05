@@ -2,17 +2,12 @@ import pathlib
 import pandas
 import global_constants as gc
 
-# for print statement
-pandas.set_option('display.max_rows', 500)
-pandas.set_option('display.max_columns', 500)
-pandas.set_option('display.width', 1000)
 
-raw_data_path = pathlib.Path().absolute() / gc.RAW_DATA_FOLDER_NAME
-raw_data = []
-
-for f in raw_data_path.rglob("*.csv"):
-    raw_data.append(f)
-
+def set_print_settings():
+    # set window options for print statement
+    pandas.set_option('display.max_rows', 500)
+    pandas.set_option('display.max_columns', 500)
+    pandas.set_option('display.width', 1000)
 
 class NamedDataFrame(object):
     def __init__(self, name, df):
@@ -52,13 +47,13 @@ class LikertResponse(object):
     def __str__(self):
         return str(self.likert_code) + "_" + str(self.trial_id) + "_" + str(self.subject_id)
 
-# TODO: check code coverage
 # TODO: document file
-def clean_columns(raw_data, to_drop):
-    # list of all the clean data data frames
+def clean_columns(raw_data_file_paths, to_drop):
+
     clean_data = []
-    for f in raw_data:
-        df = pandas.read_csv(f)
+
+    for raw_file in raw_data_file_paths:
+        df = pandas.read_csv(raw_file)
         df.drop(to_drop, inplace=True, axis=1, errors='ignore')
         msg_responses = []
         likert_responses = []
@@ -77,8 +72,8 @@ def clean_columns(raw_data, to_drop):
             msg_likert.append(
                 MessageAndLikert(response.subject_id, response.trial_id, response, related_likert_messages))
 
-
         likert_responses.sort(key=lambda x: x.trial_id)
+
         # subject id should not be hard coded
         dict = {'SubjectID': ['045d6e36']}
         new_columns = []
@@ -99,7 +94,6 @@ def clean_columns(raw_data, to_drop):
                 new_columns.append(msg_responses[i].msg_id + "_LM3_Response_Time")
 
                 if i != 0 and (i - 2) % 3 == 0:
-                    # TODO: make columns not hard coded
                     new_columns.append(msg_responses[i].trial_id + "_LB1_Response")
                     new_columns.append(msg_responses[i].trial_id + "_LB1_Response_Time")
                     new_columns.append(msg_responses[i].trial_id + "_LB2_Response")
@@ -122,9 +116,10 @@ def clean_columns(raw_data, to_drop):
             elif l_response.subject_id == '045d6e36' and l_response.associated_msg == "System":
                 dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response")] = l_response.answer
                 dict[(l_response.trial_id + "_" + l_response.likert_code + "_Response_Time")] = l_response.resp_time
-        #TODO: check ordering of exported file Likert Block Questions and Responses
-        new_df = pandas.DataFrame(data= dict, columns=new_columns)
-        clean_data.append(NamedDataFrame(f.name, new_df))
+
+        # reindex forces the correct ordering of the columns
+        new_df = pandas.DataFrame(data= dict, columns=new_columns).reindex(columns=new_columns)
+        clean_data.append(NamedDataFrame(raw_file.name, new_df))
 
     return clean_data
 
@@ -190,7 +185,25 @@ def create_likert_responses(df, ind, likert_response):
     likert_response.append(
         LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB7', df['key19'][ind],
                        df['rt19'][ind]))
+def write_csv(cleaned_data):
+    for named_frame in cleaned_data:
+        # create a new csv in the clean_data_path directory, with the same name
+        # as the original file
+        path = clean_data_path / named_frame.name
+        frame = named_frame.df
+        frame_index = frame.index.name
 
+        frame.to_csv(path, index=frame_index, header=True)
+
+set_print_settings()
+
+# populate the raw data path
+raw_data_path = pathlib.Path().absolute() / gc.RAW_DATA_FOLDER_NAME
+raw_data_file_paths = []
+
+# iterate through the csv files in the raw_data folder
+for path in raw_data_path.rglob("*.csv"):
+    raw_data_file_paths.append(path)
 
 to_drop = ['Experiment', 'Schedule', 'TestName',
            'MPoint', 'SessionName', 'SessionID', 'LaunchTime',
@@ -207,18 +220,6 @@ to_drop = ['Experiment', 'Schedule', 'TestName',
 
 clean_data_path = pathlib.Path().absolute() / gc.CLEAN_DATA_FOLDER_NAME
 
-cleaned_data = clean_columns(raw_data, to_drop)
-
-
-def write_csv(cleaned_data):
-    for named_frame in cleaned_data:
-        # create a new csv in the clean_data_path directory, with the same name
-        # as the original file
-        path = clean_data_path / named_frame.name
-        frame = named_frame.df
-        frame_index = frame.index.name
-
-        frame.to_csv(path, index=frame_index, header=True)
-
+cleaned_data = clean_columns(raw_data_file_paths, to_drop)
 
 write_csv(cleaned_data)
