@@ -222,7 +222,5 @@ def main():
     write_csv(cleaned_data)
 
 
-main()
-
 if __name__ == "__main__":
     main()
