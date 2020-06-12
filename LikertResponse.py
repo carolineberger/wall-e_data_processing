@@ -1,10 +1,9 @@
 class LikertResponse(object):
-    def __init__(self, subject_id, trial_id, likert_code, answer, resp_time, associated_msg="System"):
+    def __init__(self, subject_id, trial_id, likert_code, answer, associated_msg="System"):
         self.subject_id = subject_id
         self.trial_id = trial_id
         self.likert_code = likert_code
         self.answer = answer
-        self.resp_time = resp_time
         self.associated_msg = associated_msg
 
     def __str__(self):
