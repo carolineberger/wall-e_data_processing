@@ -1,6 +1,5 @@
 import pandas
 from LikertResponse import LikertResponse
-from MessageAndLikert import MessageAndLikert
 from MessageResponse import MessageResponse
 from NamedDataFrame import NamedDataFrame
 from process import clean_data_path
