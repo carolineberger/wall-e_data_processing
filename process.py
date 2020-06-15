@@ -1,8 +1,6 @@
-import pathlib
-import global_constants as gc
 from data_utilities import *
 
-global clean_data_path
+
 clean_data_path = pathlib.Path().absolute() / gc.CLEAN_DATA_FOLDER_NAME
 
 def set_print_settings():
@@ -13,33 +11,32 @@ def set_print_settings():
 
 def main():
     set_print_settings()
+    get_param_info()
+    raw_file_info_path = pathlib.Path().absolute() / gc.RAW_FILE_INFO_FOLDER_NAME
+    column_structure = []
+    for info_path in raw_file_info_path.rglob("*.csv"):
+        df = pandas.read_csv(info_path)
+        if info_path.name == gc.COLUMN_INFO_FILE_NAME:
+            column_structure = df.columns.tolist()
+
     # populate the raw data path
     raw_data_path = pathlib.Path().absolute() / gc.RAW_DATA_FOLDER_NAME
     raw_data_file_paths = []
     # iterate through the csv files in the raw_data folder
     for path in raw_data_path.rglob("*.csv"):
-        raw_data_file_paths.append(path)
+        # append if and only if the columns match a specific form
+        df = pandas.read_csv(path)
+
+        if set(column_structure) == set(df.columns.tolist()):
+            raw_data_file_paths.append(path)
+        else:
+            print('RAW DATA ERROR!\n'+ str(path) + ' was not processed. \nRaw data file column structure must contain the following: \n' + str(column_structure))
 
 
-    ### MAKE TEXT FILE THAT CAN CHANGE
-    to_drop = ['Experiment', 'Schedule', 'TestName',
-               'MPoint', 'SessionName', 'SessionID', 'LaunchTime',
-               'StartTime', 'ResultTime', 'GMTOffset',
-               'Exception', 'Remark', 'blktime',
-               'blkno', 'block', 'trlno',
-               'trial', 'trlspec', 'f1',
-               'f2', 'f3', 'f4', 'msgblk_v1', 'msgblk_v2',
-               'msgblk_v4', 'msgblk_v5', 'msgblk_v7', 'msgblk_v8',
-               'lab1', 'lab2', 'lab3', 'lab4', 'lab5', 'lab6', 'lab7',
-               'lab8', 'lab9', 'lab10', 'lab11', 'lab12', 'lab13', 'lab14',
-               'lab15', 'lab16', 'lab17', 'lab18', 'lab19', 'rt2',
-               'rt3', 'rt4', 'rt6', 'rt7', 'rt8', 'rt10', 'rt11',
-               'rt12', 'rt13', 'rt14', 'rt15', 'rt16', 'rt17', 'rt18',
-               'rt19'
-               ]
-
-    cleaned_data = clean_columns(raw_data_file_paths, to_drop)
+    cleaned_data = clean_columns(raw_data_file_paths)
     write_csv(cleaned_data)
+
+
 
 
 if __name__ == "__main__":
