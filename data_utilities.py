@@ -105,7 +105,6 @@ def create_likert_responses(df, ind, likert_response):
     # #msg * likert_count + msg_responses (a, a, b) + 1 (next index)
     key_num = (msg_per_block_count * msg_likert_count) + msg_per_block_count + 1
     for lbr in range(1, (block_likert_count+1)):
-        print(key_num)
         likert_response.append(
             LikertResponse(df['SubjectID'][ind], df['trlid'][ind], 'LB'+str(lbr), df['key'+str(key_num)][ind]))
         key_num = key_num + 1
