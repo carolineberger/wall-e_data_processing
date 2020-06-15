@@ -6,8 +6,8 @@ Install python: https://www.python.org/downloads/
 
 Step 2: 
 Install pandas and pathlib libraries.
-pip install pandas
-pip install pathlib
+```pip install pandas```
+```pip install pathlib```
 
 Step 3:
 Clone wall-e_data_processing.
