@@ -1,17 +1,24 @@
 from data_utilities import *
 
-
 clean_data_path = pathlib.Path().absolute() / gc.CLEAN_DATA_FOLDER_NAME
 
 def set_print_settings():
+    """""
+    Set print settings for debugging
+    """""
     # set window options for print statement
     pandas.set_option('display.max_rows', 500)
     pandas.set_option('display.max_columns', 500)
     pandas.set_option('display.width', 1000)
 
 def main():
+    """""
+    Use data_utilities to clean raw data, and 
+    export raw data to new csv files with the same
+    name as their raw data counterparts. 
+    """""
     set_print_settings()
-    get_param_info()
+
     raw_file_info_path = pathlib.Path().absolute() / gc.RAW_FILE_INFO_FOLDER_NAME
     column_structure = []
     for info_path in raw_file_info_path.rglob("*.csv"):
