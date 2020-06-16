@@ -19,7 +19,7 @@ Install pandas and pathlib libraries.
 
 Step 5: 
 Run python program.
-'''python process.py'''
+```python process.py```
 
 Step 6:
 Output will be in clean_data folder. 
