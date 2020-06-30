@@ -5,6 +5,5 @@ class LikertResponse(object):
         self.likert_code = likert_code
         self.answer = answer
         self.associated_msg = associated_msg
-
     def __str__(self):
         return str(self.likert_code) + "_" + str(self.trial_id) + "_" + str(self.subject_id)

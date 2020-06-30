@@ -1,5 +1,5 @@
 class MessageResponse(object):
-    def __init__(self, subject_id, trial_id, msg_id, answer, resp_time):
+    def __init__(self, subject_id, trial_id, answer, resp_time, msg_id):
         self.subject_id = subject_id
         self.trial_id = trial_id
         self.msg_id = msg_id

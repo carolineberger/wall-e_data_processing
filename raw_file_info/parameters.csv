@@ -1,2 +1,2 @@
-BlockCount,MessagePerBlockCount,MessageLikertCount,BlockLikertCount
-16,3,3,7
+MessagePerBlockCount,MessageLikertCount,BlockLikertCount,AttnChk1,AttnChk2
+3,3,7,7,1

@@ -21,6 +21,7 @@ def main():
 
     raw_file_info_path = pathlib.Path().absolute() / gc.RAW_FILE_INFO_FOLDER_NAME
     column_structure = []
+    #load all_collumns csv into list called column_structure
     for info_path in raw_file_info_path.rglob("*.csv"):
         df = pandas.read_csv(info_path)
         if info_path.name == gc.COLUMN_INFO_FILE_NAME:
