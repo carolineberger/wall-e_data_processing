@@ -5,7 +5,7 @@ Step 1:
 Download wall-e_data_processing.
 
 Step 2:
-Place raw data files into raw_data folder. 
+Open raw data files and manually scan the file to be sure that the export was successful (columns look familiar, data seems to be filled in). Place raw data files into raw_data folder. 
 
 Step 3:
 Install python: https://www.python.org/downloads/ 
