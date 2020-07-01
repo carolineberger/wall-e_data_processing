@@ -56,7 +56,7 @@ def attention_checks(df):
         elif df['trlid'][ind] == "ATTN_2":
             if (str(df['key1'][ind]) != str(attention_check_1_ans)):
                 f.write("ATTENTION CHECK FAILURE.\nParticipant: " + df['SubjectID'][ind] + "\nAttention check: 2\nExpected input: " + str(
-                    attention_check_2_ans) + ". \nParticipant input: " + str(df['key1'][ind]))
+                    attention_check_2_ans) + "\nParticipant input: " + str(df['key1'][ind]))
     f.close()
     return df
 
@@ -107,8 +107,12 @@ def create_internal_data_types(df, rows):
         blk_list = []
         for resp in likert_responses:
             if resp.trial_id not in blk_list and row['SubjectID'] == resp.subject_id:
+                if len(blk_list) == 0:
+                    block_ordering = resp.trial_id
+                else:
+                    block_ordering = block_ordering + " | " + resp.trial_id
                 blk_list.append(resp.trial_id)
-                block_ordering = block_ordering + " | " +resp.trial_id
+
         row['Block_Display_Order'] = block_ordering
     # sort first by subject id, then by message id
     msg_responses.sort(key=lambda x: (x.subject_id, x.msg_id))
