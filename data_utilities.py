@@ -52,11 +52,11 @@ def attention_checks(df):
             if (str(df['key1'][ind]) != str(attention_check_1_ans)):
                 f.write("ATTENTION CHECK FAILURE.\nParticipant: " + df['SubjectID'][
                     ind] + "\nAttention check: 1\nExpected input: " + str(
-                    attention_check_1_ans) + ". \nParticipant input: " + str(df['key1'][ind]))
+                    attention_check_1_ans) + ". \nParticipant input: " + str(df['key1'][ind])+ "\n\n")
         elif df['trlid'][ind] == "ATTN_2":
             if (str(df['key1'][ind]) != str(attention_check_1_ans)):
                 f.write("ATTENTION CHECK FAILURE.\nParticipant: " + df['SubjectID'][ind] + "\nAttention check: 2\nExpected input: " + str(
-                    attention_check_2_ans) + "\nParticipant input: " + str(df['key1'][ind]))
+                    attention_check_2_ans) + "\nParticipant input: " + str(df['key1'][ind]) + "\n\n")
     f.close()
     return df
 
