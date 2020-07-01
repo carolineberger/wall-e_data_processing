@@ -28,14 +28,14 @@ def clean_columns(raw_data_file_paths):
         df = df[df['trlid'] != "Show_Inst_1"]
 
         likert_responses, msg_responses = create_internal_data_types(df, rows)
-
-
-
         first_sub_id = get_first_sub_id(rows)
 
         new_columns = make_columns(msg_responses, first_sub_id)
+
         likert_responses.sort(key=lambda x: x.associated_msg)
         fill_rows(likert_responses, msg_responses, rows)
+
+
         # reindex forces the correct ordering of the columns
         new_df = pandas.DataFrame(data= rows, columns=new_columns).reindex(columns=new_columns)
         clean_data.append(NamedDataFrame(raw_file.name, new_df))
@@ -99,7 +99,17 @@ def create_internal_data_types(df, rows):
             rows.append(row)
         create_message_responses(df, ind, msg_responses)
         create_likert_responses(df, ind, likert_responses)
+    #before sorting, create an order and associate it with a subject id
 
+    # block ordering need to sort by row too
+    for row in rows:
+        block_ordering = ""
+        blk_list = []
+        for resp in likert_responses:
+            if resp.trial_id not in blk_list and row['SubjectID'] == resp.subject_id:
+                blk_list.append(resp.trial_id)
+                block_ordering = block_ordering + " | " +resp.trial_id
+        row['Block_Display_Order'] = block_ordering
     # sort first by subject id, then by message id
     msg_responses.sort(key=lambda x: (x.subject_id, x.msg_id))
     likert_responses.sort(key=lambda x: (x.subject_id, x.trial_id))
@@ -149,6 +159,7 @@ def make_columns(msg_responses, first_sub_id):
             if i != 0 and (i - 2) % 3 == 0:
                 for lb in range(1, (block_likert_count + 1)):
                     new_columns.append(msg_responses[i].trial_id + "_LB"+ str(lb)+"_Response")
+    new_columns.append('Block_Display_Order')
     return new_columns
 
 
