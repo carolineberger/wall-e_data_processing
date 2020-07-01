@@ -22,4 +22,4 @@ Run python program.
 ```python process.py```
 
 Step 6:
-Output will be in clean_data folder. 
+Output data file and results of the attention check will be in clean_data folder. 
