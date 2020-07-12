@@ -22,9 +22,8 @@ def clean_columns(raw_data_file_paths):
         df = pandas.read_csv(raw_file)
         ## ATTENTION CHECKS
         df = attention_checks(df)
-        # REMOVE ATTNCHECKS AND SHOW_INST_1
+        # REMOVE ATTNCHECK AND SHOW_INST_1
         df = df[df['trlid'] != "ATTN_1"]
-        df = df[df['trlid'] != "ATTN_2"]
         df = df[df['trlid'] != "Show_Inst_1"]
 
         likert_responses, msg_responses = create_internal_data_types(df, rows)
@@ -46,17 +45,13 @@ def attention_checks(df):
     attention_chk_info_path = clean_data_path / "Attention_Check_Results.txt"
     f = open(attention_chk_info_path, "w")
 
-    (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans, attention_check_2_ans) = get_param_info()
+    (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans) = get_param_info()
     for ind in df.index:
         if df['trlid'][ind] == "ATTN_1":
             if (str(df['key1'][ind]) != str(attention_check_1_ans)):
                 f.write("ATTENTION CHECK FAILURE.\nParticipant: " + df['SubjectID'][
                     ind] + "\nAttention check: 1\nExpected input: " + str(
                     attention_check_1_ans) + ". \nParticipant input: " + str(df['key1'][ind])+ "\n\n")
-        elif df['trlid'][ind] == "ATTN_2":
-            if (str(df['key1'][ind]) != str(attention_check_1_ans)):
-                f.write("ATTENTION CHECK FAILURE.\nParticipant: " + df['SubjectID'][ind] + "\nAttention check: 2\nExpected input: " + str(
-                    attention_check_2_ans) + "\nParticipant input: " + str(df['key1'][ind]) + "\n\n")
     f.close()
     return df
 
@@ -151,7 +146,7 @@ def make_columns(msg_responses, first_sub_id):
     :param first_sub_id: first subject id to appear
     :type first_sub_id: str
     """""
-    (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans, attention_check_2_ans) = get_param_info()
+    (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans) = get_param_info()
     new_columns = []
     new_columns.append('SubjectID')
     for i in range(len(msg_responses)):
@@ -177,7 +172,7 @@ def create_message_responses(df, ind, msg_responses):
     :param msg_responses: list of all message responses
     :type msg_responses: [MessageResponse]
     """""
-    (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans, attention_check_2_ans) = get_param_info()
+    (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans) = get_param_info()
     key_rt_num = 1
     blk_v = 3
     for m in range(1, (msg_per_block_count + 1)):
@@ -199,8 +194,7 @@ def create_likert_responses(df, ind, likert_response):
     :param likert_response: list of all likert_responses
     :type likert_response: [LikertResponse]
     """""
-    (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans,
-                    attention_check_2_ans) = get_param_info()
+    (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans) = get_param_info()
     key_num = 2
     blk_v = 3
     for msgs in range(1, (msg_per_block_count+1)):
@@ -241,8 +235,7 @@ def get_param_info():
     of likert questions per block.
     :raises prints an error if parameters file does not match what it is expecting
     :rtype: (int, int, int, int)
-    :return: [msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans,
-                    attention_check_2_ans]
+    :return: [msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans]
     """
     raw_file_info_path = pathlib.Path().absolute() / gc.RAW_FILE_INFO_FOLDER_NAME
     for info_path in raw_file_info_path.rglob("*.csv"):
@@ -255,9 +248,7 @@ def get_param_info():
             msg_likert_count = init_params(param_dict, 'MessageLikertCount')
             block_likert_count = init_params(param_dict, 'AttnChk1')
             attention_check_1_ans = init_params(param_dict, 'AttnChk1')
-            attention_check_2_ans = init_params(param_dict, 'AttnChk2')
-            return [msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans,
-                    attention_check_2_ans]
+            return [msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans]
         except:
             print("Error in " + info_path.name + ".\nYou are not allowed to change the column names or add more columns.\nMake sure there are no white spaces between comma seperated elements.")
 
