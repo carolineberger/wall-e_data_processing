@@ -44,15 +44,20 @@ def clean_columns(raw_data_file_paths):
 def attention_checks(df):
     attention_chk_info_path = clean_data_path / "Attention_Check_Results.txt"
     f = open(attention_chk_info_path, "w")
-
+    rows_to_drop = []
     (msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans) = get_param_info()
     for ind in df.index:
         if df['trlid'][ind] == "ATTN_1":
             if (str(df['key1'][ind]) != str(attention_check_1_ans)):
-                f.write("ATTENTION CHECK FAILURE.\nParticipant: " + df['SubjectID'][
+                f.write("ATTENTION CHECK FAILURE\nParticipant: " + df['SubjectID'][
                     ind] + "\nAttention check: 1\nExpected input: " + str(
-                    attention_check_1_ans) + ". \nParticipant input: " + str(df['key1'][ind])+ "\n\n")
+                    attention_check_1_ans) + "\nParticipant input: " + str(df['key1'][ind])+ "\n\n")
+                rows_to_drop.append(df['SubjectID'][
+                    ind])
     f.close()
+    ### COMMENT IN AND OUT FOR 1st and 2nd raw data file #####
+    df = df[~df['SubjectID'].isin(rows_to_drop)]
+
     return df
 
 def get_first_sub_id(rows):
