@@ -251,7 +251,7 @@ def get_param_info():
             param_dict = df.to_dict()
             msg_per_block_count = init_params(param_dict, 'MessagePerBlockCount')
             msg_likert_count = init_params(param_dict, 'MessageLikertCount')
-            block_likert_count = init_params(param_dict, 'AttnChk1')
+            block_likert_count = init_params(param_dict, 'BlockLikertCount')
             attention_check_1_ans = init_params(param_dict, 'AttnChk1')
             return [msg_per_block_count, msg_likert_count, block_likert_count, attention_check_1_ans]
         except:
